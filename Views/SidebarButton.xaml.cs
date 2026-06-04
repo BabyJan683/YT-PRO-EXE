@@ -63,7 +63,7 @@ public partial class SidebarButton : UserControl
         if (d is SidebarButton sb && e.NewValue is string iconName)
         {
             if (Enum.TryParse<MaterialDesignThemes.Wpf.PackIconKind>(iconName, out var kind))
-                sb.Icon.Kind = kind;
+                sb.IconControl.Kind = kind;
         }
     }
 
@@ -95,7 +95,7 @@ public partial class SidebarButton : UserControl
                 ? (System.Windows.Media.Brush)sb.FindResource("PrimaryHueMidBrush")
                 : (System.Windows.Media.Brush)sb.FindResource("MaterialDesignBodyLight");
             sb.Txt.Foreground = color;
-            sb.Icon.Foreground = color;
+            sb.IconControl.Foreground = color;
         }
     }
 

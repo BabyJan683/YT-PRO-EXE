@@ -148,13 +148,61 @@ jobs:
           & $iscc Installer\setup.iss
           Write-Host "Installer created"
 
-      - name: Upload EXE (standalone)
+      - name: Create GitHub Release v2.0.0
+        shell: powershell
+        run: |
+          $headers = @{
+            "Authorization" = "token ${{ secrets.GITHUB_TOKEN }}"
+            "Accept" = "application/vnd.github.v3+json"
+          }
+          $body = @{
+            tag_name = "v2.0.0"
+            name = "YT Downloader Pro v2.0.0"
+            body = "## YT Downloader Pro v2.0.0`n`nProfessional YouTube downloader with IDM-style interface.`n`n### Features`n- Download YouTube videos in any quality`n- MP3/MP4 conversion`n- System tray icon`n- Clipboard monitor`n- 7-day trial with product key activation`n- Browser extension support`n`n### Install`nDownload and run the Setup EXE below."
+            draft = $false
+            prerelease = $false
+          } | ConvertTo-Json
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
+            -Method POST -Headers $headers -Body $body -ContentType "application/json"
+          echo "RELEASE_ID=$($release.id)" >> $env:GITHUB_ENV
+          echo "UPLOAD_URL=$($release.upload_url)" >> $env:GITHUB_ENV
+          Write-Host "Release created: $($release.html_url)"
+
+      - name: Upload EXE to Release
+        shell: powershell
+        run: |
+          $headers = @{
+            "Authorization" = "token ${{ secrets.GITHUB_TOKEN }}"
+            "Content-Type" = "application/octet-stream"
+          }
+          $uploadUrl = "${{ env.UPLOAD_URL }}" -replace '\{\?name,label\}', ''
+          $exePath = "publish\YTDownloaderPro.exe"
+          Invoke-RestMethod -Uri "${uploadUrl}?name=YTDownloaderPro.exe" `
+            -Method POST -Headers $headers -InFile $exePath
+          Write-Host "EXE uploaded to release"
+
+      - name: Upload Installer to Release
+        shell: powershell
+        run: |
+          $headers = @{
+            "Authorization" = "token ${{ secrets.GITHUB_TOKEN }}"
+            "Content-Type" = "application/octet-stream"
+          }
+          $uploadUrl = "${{ env.UPLOAD_URL }}" -replace '\{\?name,label\}', ''
+          $installer = Get-ChildItem Output -Filter "*.exe" | Select-Object -First 1
+          if ($installer) {
+            Invoke-RestMethod -Uri "${uploadUrl}?name=$($installer.Name)" `
+              -Method POST -Headers $headers -InFile $installer.FullName
+            Write-Host "Installer uploaded to release"
+          }
+
+      - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: YTDownloaderPro-EXE
           path: publish\YTDownloaderPro.exe
 
-      - name: Upload Installer
+      - name: Upload Installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: YTDownloaderPro-Installer

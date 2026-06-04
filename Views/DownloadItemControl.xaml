@@ -1,0 +1,141 @@
+<UserControl x:Class="YTDownloaderPro.Views.DownloadItemControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:conv="clr-namespace:YTDownloaderPro.Converters">
+    <UserControl.Resources>
+        <conv:StatusToColorConverter x:Key="StatusColorConverter"/>
+        <conv:StatusToIconConverter x:Key="StatusIconConverter"/>
+        <conv:ProgressToVisConverter x:Key="ProgressVisConverter"/>
+    </UserControl.Resources>
+
+    <md:Card Padding="0" UniformCornerRadius="6" Margin="2">
+        <Grid MinHeight="72">
+            <!-- Progress background fill -->
+            <Border x:Name="ProgressBg" CornerRadius="6" Opacity="0.12"
+                    Background="{Binding Status, Converter={StaticResource StatusColorConverter}}"
+                    HorizontalAlignment="Left"
+                    Width="{Binding Progress, Converter={StaticResource ProgressToWidthConverter}, RelativeSource={RelativeSource AncestorType=md:Card}}"/>
+
+            <Grid Margin="10,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Thumbnail / icon -->
+                <Border Grid.Column="0" Width="44" Height="44" CornerRadius="4"
+                        VerticalAlignment="Center">
+                    <Border.Clip>
+                        <RectangleGeometry RadiusX="4" RadiusY="4" Rect="0,0,44,44"/>
+                    </Border.Clip>
+                    <Grid>
+                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+                        <Border Background="#88000000">
+                            <md:PackIcon Kind="{Binding MediaType, Converter={StaticResource MediaTypeIconConverter}}"
+                                         Width="20" Height="20" Foreground="White"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Title and URL -->
+                <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title, FallbackValue='Fetching info...'}"
+                               FontWeight="SemiBold" FontSize="13"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="400"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                        <md:PackIcon Kind="Web" Width="12" Height="12"
+                                     Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                     Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Url}" FontSize="11"
+                                   Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                   TextTrimming="CharacterEllipsis" MaxWidth="350"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                        <TextBlock Text="{Binding Duration}" FontSize="11"
+                                   Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                   Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding Uploader}" FontSize="11"
+                                   Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                        <TextBlock Text=" | Playlist: " FontSize="11"
+                                   Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                   Visibility="{Binding IsPlaylist, Converter={StaticResource BoolVisConverter}}"/>
+                        <TextBlock Text="{Binding PlaylistProgress}" FontSize="11"
+                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                   Visibility="{Binding IsPlaylist, Converter={StaticResource BoolVisConverter}}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Status icon -->
+                <Border Grid.Column="2" Width="30" VerticalAlignment="Center">
+                    <md:PackIcon Kind="{Binding Status, Converter={StaticResource StatusIconConverter}}"
+                                 Width="22" Height="22"
+                                 Foreground="{Binding Status, Converter={StaticResource StatusColorConverter}}"
+                                 VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Progress bar + status -->
+                <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6"
+                                 Margin="0,0,0,4"
+                                 Foreground="{Binding Status, Converter={StaticResource StatusColorConverter}}"
+                                 Style="{StaticResource MaterialDesignLinearProgressBar}"/>
+                    <TextBlock Text="{Binding StatusDisplay}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
+                </StackPanel>
+
+                <!-- Speed / ETA -->
+                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding SpeedDisplay}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <TextBlock Text="{Binding Eta, StringFormat='ETA: {0}'}" FontSize="11"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               Visibility="{Binding Eta, Converter={StaticResource StringVisConverter}}"/>
+                </StackPanel>
+
+                <!-- Size -->
+                <StackPanel Grid.Column="5" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding DownloadedSize}" FontSize="12"/>
+                    <TextBlock FontSize="11" Foreground="{DynamicResource MaterialDesignBodyLight}">
+                        <Run Text="/ "/>
+                        <Run Text="{Binding TotalSize}"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Action buttons -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Center"
+                            HorizontalAlignment="Right">
+                    <!-- Pause / Resume -->
+                    <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            ToolTip="Pause" Click="BtnPause_Click"
+                            Visibility="{Binding CanPause, Converter={StaticResource BoolVisConverter}}">
+                        <md:PackIcon Kind="Pause" Width="18" Height="18"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            ToolTip="Resume" Click="BtnResume_Click"
+                            Visibility="{Binding CanResume, Converter={StaticResource BoolVisConverter}}">
+                        <md:PackIcon Kind="Play" Width="18" Height="18"
+                                     Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button>
+                    <!-- Open folder -->
+                    <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            ToolTip="Open Folder" Click="BtnOpenFolder_Click">
+                        <md:PackIcon Kind="FolderOpen" Width="18" Height="18"/>
+                    </Button>
+                    <!-- Remove -->
+                    <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            ToolTip="Remove" Click="BtnRemove_Click">
+                        <md:PackIcon Kind="Close" Width="18" Height="18" Foreground="#CC0000"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </md:Card>
+</UserControl>

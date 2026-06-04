@@ -362,12 +362,12 @@ public class MainViewModel : INotifyPropertyChanged
 
     public void ApplyTheme()
     {
-        var paletteHelper = new MaterialDesignThemes.Wpf.PaletteHelper();
-        var theme = paletteHelper.GetTheme();
-        theme.SetBaseTheme(Theme == "Dark"
-            ? MaterialDesignThemes.Wpf.BaseTheme.Dark
-            : MaterialDesignThemes.Wpf.BaseTheme.Light);
-        paletteHelper.SetTheme(theme);
+        var paletteHelper = new PaletteHelper();
+        var mdTheme = paletteHelper.GetTheme();
+        mdTheme.SetBaseTheme(Theme == "Dark"
+            ? BaseTheme.Dark
+            : BaseTheme.Light);
+        paletteHelper.SetTheme(mdTheme);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

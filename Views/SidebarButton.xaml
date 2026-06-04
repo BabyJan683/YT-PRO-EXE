@@ -1,0 +1,64 @@
+<UserControl x:Class="YTDownloaderPro.Views.SidebarButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Button x:Name="Btn" Click="Btn_Click"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            Background="Transparent"
+            BorderThickness="0"
+            Padding="8,8"
+            Cursor="Hand">
+        <Button.Style>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#15808080"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#25808080"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Button.Style>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Active indicator bar -->
+            <Border x:Name="ActiveBar" Grid.Column="0" Width="3" Height="20"
+                    CornerRadius="2" Margin="0,0,8,0"
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    Visibility="Collapsed"/>
+
+            <md:PackIcon x:Name="Icon" Grid.Column="0" Width="18" Height="18"
+                         Margin="4,0,10,0" VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            <TextBlock x:Name="Txt" Grid.Column="1" VerticalAlignment="Center"
+                       FontSize="13" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            <Border Grid.Column="2" x:Name="CountBadge" CornerRadius="8"
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    Padding="5,1" Visibility="Collapsed">
+                <TextBlock x:Name="TxtCount" FontSize="10" Foreground="White"/>
+            </Border>
+        </Grid>
+    </Button>
+</UserControl>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YT Downloader Pro</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      width: 300px;
+      background: #1a1a2e;
+      color: #e0e0e0;
+    }
+    .header {
+      background: #E53935;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+    }
+    .header .version {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-left: auto;
+    }
+    .body { padding: 16px; }
+    .status-card {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4CAF50;
+      flex-shrink: 0;
+    }
+    .status-dot.offline { background: #f44336; }
+    .status-text { font-size: 13px; color: #aaa; }
+    .current-url {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .current-url .label {
+      font-size: 10px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .current-url .url {
+      font-size: 12px;
+      color: #e0e0e0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+    .btn-primary {
+      background: #E53935;
+      color: white;
+    }
+    .btn-primary:hover { background: #c62828; }
+    .btn-primary:disabled { background: #555; cursor: not-allowed; }
+    .btn-secondary {
+      background: #16213e;
+      color: #aaa;
+      border: 1px solid #333;
+    }
+    .btn-secondary:hover { background: #0f3460; color: #fff; }
+    .divider { height: 1px; background: #333; margin: 12px 0; }
+    .footer {
+      text-align: center;
+      padding: 8px 16px 16px;
+      font-size: 11px;
+      color: #555;
+    }
+    #result {
+      font-size: 12px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 8px;
+      display: none;
+    }
+    .success { background: #1b5e20; color: #a5d6a7; }
+    .error { background: #b71c1c; color: #ffcdd2; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+      <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+    </svg>
+    <h1>YT Downloader Pro</h1>
+    <span class="version">v2.0</span>
+  </div>
+
+  <div class="body">
+    <div class="status-card">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-text" id="statusText">Checking app...</span>
+    </div>
+
+    <div class="current-url">
+      <div class="label">Current page</div>
+      <div class="url" id="currentUrl">Loading...</div>
+    </div>
+
+    <button class="btn btn-primary" id="btnDownload" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+      </svg>
+      Download This Video
+    </button>
+
+    <div id="result"></div>
+
+    <div class="divider"></div>
+
+    <button class="btn btn-secondary" id="btnOpenApp">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 4H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 15.17l7.59-7.59L21 9l-9 9z"/>
+      </svg>
+      Open YT Downloader Pro
+    </button>
+  </div>
+
+  <div class="footer">Supports YouTube, Vimeo, TikTok, Instagram & 1000+ sites</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

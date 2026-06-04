@@ -213,6 +213,8 @@ end;
 
 { ── Ask to download .NET if missing ────────────────────────────────────────── }
 function InitializeSetup: Boolean;
+var
+  ErrCode : Integer;
 begin
   Result := True;
   if not IsDotNetInstalled then
@@ -222,7 +224,7 @@ begin
     begin
       ShellExec('open',
         'https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.0-windows-x64-installer',
-        '', '', SW_SHOWNORMAL, ewNoWait, 0);
+        '', '', SW_SHOWNORMAL, ewNoWait, ErrCode);
       MsgBox('Please install .NET 8 Desktop Runtime, then re-run this installer.',
              mbInformation, MB_OK);
       Result := False;

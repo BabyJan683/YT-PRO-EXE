@@ -110,7 +110,7 @@ Name: "browserext";     Description: "Install browser extension helper";      Gr
 ; ── Files to install ──────────────────────────────────────────────────────────
 [Files]
 ; Main application EXE  (single-file publish)
-Source: "..\bin\Release\net8.0-windows\win-x64\publish\{#AppExeName}"; \
+Source: "..\publish\{#AppExeName}"; \
         DestDir: "{app}"; Flags: ignoreversion
 
 ; Resources: yt-dlp, aria2, ffmpeg (skip if not present — app downloads on first run)

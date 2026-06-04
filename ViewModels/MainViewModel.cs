@@ -159,14 +159,18 @@ public class MainViewModel : INotifyPropertyChanged
 
         AddDownloadCommand = new RelayCommand(OnAddDownload);
         PasteAndDownloadCommand = new RelayCommand(OnPasteAndDownload);
-        PauseCommand = new RelayCommand<DownloadItem>(item => item != null && _downloadManager != null
-            ? _downloadManager.PauseDownload(item.Id) : default);
-        ResumeCommand = new RelayCommand<DownloadItem>(item => item != null
-            ? _downloadManager.ResumeDownload(item.Id) : default);
-        StopCommand = new RelayCommand<DownloadItem>(item => item != null
-            ? _downloadManager.StopDownload(item.Id) : default);
-        RemoveCommand = new RelayCommand<DownloadItem>(item => item != null
-            ? _downloadManager.RemoveDownload(item.Id) : default);
+        PauseCommand = new RelayCommand<DownloadItem>(item => {
+            if (item != null && _downloadManager != null) _downloadManager.PauseDownload(item.Id);
+        });
+        ResumeCommand = new RelayCommand<DownloadItem>(item => {
+            if (item != null) _downloadManager.ResumeDownload(item.Id);
+        });
+        StopCommand = new RelayCommand<DownloadItem>(item => {
+            if (item != null) _downloadManager.StopDownload(item.Id);
+        });
+        RemoveCommand = new RelayCommand<DownloadItem>(item => {
+            if (item != null) _downloadManager.RemoveDownload(item.Id);
+        });
         OpenFolderCommand = new RelayCommand<DownloadItem>(OpenFolder);
         PauseAllCommand = new RelayCommand(_downloadManager.PauseAll);
         ResumeAllCommand = new RelayCommand(_downloadManager.ResumeAll);

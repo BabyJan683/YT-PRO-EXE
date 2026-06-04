@@ -20,7 +20,7 @@
         <Border Background="{DynamicResource PrimaryHueDarkBrush}">
             <StackPanel>
                 <TextBlock Text="SETTINGS" Foreground="#AAFFFFFF" FontSize="11" FontWeight="Bold"
-                           LetterSpacing="2" Margin="16,20,16,12"/>
+ Margin="16,20,16,12"/>
                 <ListBox x:Name="LbNav" Background="Transparent" BorderThickness="0"
                          SelectionChanged="LbNav_SelectionChanged">
                     <ListBox.ItemContainerStyle>

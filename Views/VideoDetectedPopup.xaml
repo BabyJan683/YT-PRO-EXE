@@ -1,0 +1,60 @@
+<Window x:Class="YTDownloaderPro.Views.VideoDetectedPopup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Video Detected" Height="200" Width="480"
+        WindowStartupLocation="Manual"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        Loaded="Window_Loaded">
+
+    <Border CornerRadius="12" Background="{DynamicResource MaterialDesignPaper}"
+            BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" Opacity="0.4" ShadowDepth="4"/>
+        </Border.Effect>
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                <md:PackIcon Kind="VideoCheck" Width="24" Height="24"
+                             Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,10,0"/>
+                <TextBlock Text="Video URL Detected!" FontSize="16" FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- URL display -->
+            <Border Grid.Row="1" Background="{DynamicResource MaterialDesignChipBackground}"
+                    CornerRadius="4" Padding="10,8">
+                <TextBlock x:Name="TxtUrl" TextTrimming="CharacterEllipsis" FontSize="12"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                        Margin="0,16,0,0">
+                <Button Content="Ignore" Click="BtnIgnore_Click"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Margin="0,0,8,0" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                <Button Content="Download" Click="BtnDownload_Click"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Background="{DynamicResource PrimaryHueMidBrush}"/>
+            </StackPanel>
+
+            <!-- Close button -->
+            <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Style="{StaticResource MaterialDesignIconForegroundButton}"
+                    Click="BtnClose_Click" Padding="2">
+                <md:PackIcon Kind="Close" Width="16" Height="16"/>
+            </Button>
+        </Grid>
+    </Border>
+</Window>

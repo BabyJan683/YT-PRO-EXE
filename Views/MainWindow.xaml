@@ -326,7 +326,7 @@
                             <TextBlock Text="DOWNLOADS" Margin="8,12,8,4"
                                        FontSize="10" FontWeight="Bold"
                                        Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                       LetterSpacing="2"/>
+/>
 
                             <local:SidebarButton Tag="All" Text="All Downloads"
                                                  Icon="DownloadMultiple"
@@ -352,7 +352,7 @@
                             <TextBlock Text="TYPES" Margin="8,12,8,4"
                                        FontSize="10" FontWeight="Bold"
                                        Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                       LetterSpacing="2"/>
+/>
                             <local:SidebarButton Tag="Video" Text="Videos"
                                                  Icon="Video"
                                                  Click="SidebarButton_Click"/>
@@ -368,7 +368,7 @@
                                 <StackPanel>
                                     <TextBlock Text="SESSION STATS" FontSize="10" FontWeight="Bold"
                                                Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                               LetterSpacing="1" Margin="0,0,0,6"/>
+ Margin="0,0,0,6"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>

@@ -10,11 +10,9 @@
 #define AppExeName     "YTDownloaderPro.exe"
 #define AppDescription "Professional YouTube & Video Downloader"
 #define AppCopyright   "Copyright © 2026 YT Downloader Pro"
-#define AppID          "{A3F8B2C1-4D6E-8F0A-1B2C-3D4E5F6A7B8C}"
-
 ; ── Setup metadata ────────────────────────────────────────────────────────────
 [Setup]
-AppId={#AppID}
+AppId={{A3F8B2C1-4D6E-8F0A-1B2C-3D4E5F6A7B8C}}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#AppVersion}

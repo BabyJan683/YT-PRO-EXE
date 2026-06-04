@@ -1,0 +1,161 @@
+name: Build YT Downloader Pro EXE
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Generate App Icon
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path Resources -Force | Out-Null
+          Add-Type -AssemblyName System.Drawing
+          $outputPath = "Resources\app.ico"
+          $sizes = @(256, 128, 64, 48, 32, 16)
+          $frames = [System.Collections.Generic.List[System.Drawing.Bitmap]]::new()
+          foreach ($sz in $sizes) {
+            $bmp = New-Object System.Drawing.Bitmap($sz, $sz)
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+            $bgBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255,18,18,18))
+            $g.FillRectangle($bgBrush, 0, 0, $sz, $sz)
+            $pad = [int]($sz * 0.06)
+            $redBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255,220,32,32))
+            $g.FillEllipse($redBrush, $pad, $pad, $sz-$pad*2, $sz-$pad*2)
+            $cx = [float]($sz * 0.48); $cy = [float]($sz * 0.50); $r = [float]($sz * 0.26)
+            $playPts = [System.Drawing.PointF[]]@(
+              [System.Drawing.PointF]::new($cx - $r*0.55, $cy - $r),
+              [System.Drawing.PointF]::new($cx + $r, $cy),
+              [System.Drawing.PointF]::new($cx - $r*0.55, $cy + $r)
+            )
+            $whiteBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
+            $g.FillPolygon($whiteBrush, $playPts)
+            $g.Dispose()
+            $frames.Add($bmp)
+          }
+          $ms = New-Object System.IO.MemoryStream
+          $bw = New-Object System.IO.BinaryWriter($ms)
+          $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]$frames.Count)
+          $pngs = [System.Collections.Generic.List[byte[]]]::new()
+          foreach ($bmp in $frames) {
+            $tmp = New-Object System.IO.MemoryStream
+            $bmp.Save($tmp, [System.Drawing.Imaging.ImageFormat]::Png)
+            $pngs.Add($tmp.ToArray())
+          }
+          $offset = 6 + 16 * $frames.Count
+          for ($i = 0; $i -lt $frames.Count; $i++) {
+            $bmp = $frames[$i]; $data = $pngs[$i]
+            $w = if ($bmp.Width -eq 256) { 0 } else { $bmp.Width }
+            $h = if ($bmp.Height -eq 256) { 0 } else { $bmp.Height }
+            $bw.Write([byte]$w); $bw.Write([byte]$h)
+            $bw.Write([byte]0); $bw.Write([byte]0)
+            $bw.Write([uint16]1); $bw.Write([uint16]32)
+            $bw.Write([uint32]$data.Length); $bw.Write([uint32]$offset)
+            $offset += $data.Length
+          }
+          foreach ($data in $pngs) { $bw.Write($data) }
+          $bw.Flush()
+          [System.IO.File]::WriteAllBytes($outputPath, $ms.ToArray())
+          foreach ($bmp in $frames) { $bmp.Dispose() }
+          Write-Host "Icon generated OK"
+
+      - name: Download yt-dlp
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" `
+            -OutFile "Resources\yt-dlp.exe" -UseBasicParsing -TimeoutSec 120
+          Write-Host "yt-dlp downloaded"
+
+      - name: Download aria2
+        shell: powershell
+        run: |
+          $rel = Invoke-RestMethod "https://api.github.com/repos/aria2/aria2/releases/latest"
+          $asset = $rel.assets | Where-Object { $_.name -match "win-64.*\.zip$" } | Select-Object -First 1
+          $zip = "$env:TEMP\aria2.zip"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -UseBasicParsing -TimeoutSec 120
+          Expand-Archive $zip "$env:TEMP\aria2_ext" -Force
+          $exe = Get-ChildItem "$env:TEMP\aria2_ext" -Filter "aria2c.exe" -Recurse | Select-Object -First 1
+          Copy-Item $exe.FullName "Resources\aria2c.exe" -Force
+          Write-Host "aria2c downloaded"
+
+      - name: Download FFmpeg
+        shell: powershell
+        run: |
+          $rel = Invoke-RestMethod "https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/latest"
+          $asset = $rel.assets | Where-Object { $_.name -match "win64.*gpl.*\.zip$" -and $_.name -notmatch "shared" } | Select-Object -First 1
+          $zip = "$env:TEMP\ffmpeg.zip"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -UseBasicParsing -TimeoutSec 300
+          Expand-Archive $zip "$env:TEMP\ffmpeg_ext" -Force
+          foreach ($name in @("ffmpeg.exe","ffprobe.exe")) {
+            $f = Get-ChildItem "$env:TEMP\ffmpeg_ext" -Filter $name -Recurse | Select-Object -First 1
+            if ($f) { Copy-Item $f.FullName "Resources\$name" -Force }
+          }
+          Write-Host "FFmpeg downloaded"
+
+      - name: Build EXE
+        shell: powershell
+        run: |
+          dotnet publish YTDownloaderPro.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -p:DebugType=none `
+            -p:DebugSymbols=false `
+            -o publish
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Write-Host "Build complete"
+
+      - name: Copy Resources next to EXE
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path "publish\Resources" -Force | Out-Null
+          Get-ChildItem Resources -File | Copy-Item -Destination "publish\Resources" -Force
+          if (Test-Path Browser) {
+            Copy-Item Browser "publish\Browser" -Recurse -Force
+          }
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: |
+          $url = "https://jrsoftware.org/download.php/is.exe"
+          $installer = "$env:TEMP\innosetup.exe"
+          Invoke-WebRequest $url -OutFile $installer -UseBasicParsing -TimeoutSec 120
+          Start-Process $installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait
+          Write-Host "Inno Setup installed"
+
+      - name: Create Installer
+        shell: powershell
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (!(Test-Path $iscc)) { $iscc = "C:\Program Files\Inno Setup 6\ISCC.exe" }
+          New-Item -ItemType Directory -Path Output -Force | Out-Null
+          & $iscc Installer\setup.iss
+          Write-Host "Installer created"
+
+      - name: Upload EXE (standalone)
+        uses: actions/upload-artifact@v4
+        with:
+          name: YTDownloaderPro-EXE
+          path: publish\YTDownloaderPro.exe
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: YTDownloaderPro-Installer
+          path: Output\*.exe

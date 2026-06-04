@@ -52,9 +52,6 @@ public partial class BatchDownloadDialog : Window
         var format = ((System.Windows.Controls.ComboBoxItem)CmbFormat.SelectedItem)?.Tag?.ToString()
             ?? "mp4";
 
-        await _vm.AddDownloadFromUrl(string.Empty, quality, format, TxtSavePath.Text); // placeholder
-        await _vm.Downloads[0].GetType().GetMethod("remove")!.Invoke(null, null)!; // will use batch
-
         foreach (var url in urls)
             await _vm.AddDownloadFromUrl(url, quality, format, TxtSavePath.Text);
 
